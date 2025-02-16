@@ -1,12 +1,32 @@
 .content.background  {
     display: flex;
     margin-top: 44px;
-    height: calc(60vh + 4.5px);
+    min-height: calc(60vh + 4.5px);
     background-position: top left;
     background-repeat: repeat-y;
     background-size: cover;
 
+    .content-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 48vw;
+        flex-wrap: wrap;
+
+        ul {
+            width: 95%;
+        }
+
+    }
+
     .content-container * {
         color: snow;
+        li {
+            text-align: left;
+        }
+
+        ul li {
+            text-align: left;
+        }
     }
 }
