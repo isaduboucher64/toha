@@ -1,4 +1,51 @@
-{{ define "header" }}
+{{/* picked from index.html (entire content) */}}
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}">
+  <head>
+    <title>{{- .Site.Title -}}</title>
+    {{ $siteDescription := .Site.Params.description }}
+    {{ if (index .Site.Data .Site.Language.Lang).site }}
+      {{ $siteConfig := (index .Site.Data .Site.Language.Lang).site }}
+      {{ if $siteConfig.description }}
+        {{ $siteDescription = $siteConfig.description }}
+      {{ end }}
+    {{ end }}
+    <meta name="description" content="{{ $siteDescription }}" />
+    
+    <!-- import common headers -->
+    {{- partial "header.html" . -}}
+    {{- partial "opengraph.html" . -}}
+    
+    <!--================= add analytics if enabled =========================-->
+    {{- partial "analytics.html" . -}}
+    {{ with resources.Get "scripts/core/theme-scheme.js" | fingerprint }}
+    <script integrity="{{.Data.Integrity}}">
+     {{ .Content | safeJS }}
+    </script>
+    {{ end }}
+  </head>
+  <body data-bs-spy="scroll" data-bs-target="#top-navbar" data-bs-offset="100">
+
+    <!--- NAVBAR ------------------------->
+    {{- partial "navigators/navbar.html" . -}}
+
+    <!--- ADD CONTENT SECTION ---------------->
+    {{- partial "sections/content.html" . -}}
+    
+    <!--- ADD FOOTER ----------------------->
+    {{ $footerTemplate:= site.Params.footer.template | default "footer.html" }}
+    {{- partial $footerTemplate . -}}
+
+    <!--- ADD COMMON SCRIPTS --------------->
+    {{ partial "scripts.html" . }}
+
+    <!------ ADD SUPPORT LINKS -------->
+    {{- partial "misc/support.html" . -}}
+
+  </body>
+</html>
+
+{{/*  {{ define "header" }}
 <meta name="description" content="{{ if .Description }}{{ .Description }}{{ else }}{{ .Title }}{{ end }}" />
 {{ with .Params.relcanonical }}
 <link rel="canonical" href="{{ . | relLangURL }}" itemprop="url" />
@@ -186,4 +233,4 @@
     </div>
     {{ end }}
   </section>
-{{ end }}
+{{ end }}  */}}

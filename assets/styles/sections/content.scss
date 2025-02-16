@@ -1,0 +1,12 @@
+.content.background  {
+    display: flex;
+    margin-top: 44px;
+    height: calc(60vh + 4.5px);
+    background-position: top left;
+    background-repeat: repeat-y;
+    background-size: cover;
+
+    .content-container * {
+        color: snow;
+    }
+}
