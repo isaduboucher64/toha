@@ -73,11 +73,11 @@
 
 <nav class="navbar navbar-expand-xl top-navbar shadow {{ if .IsHome}}transparent-navbar homepage{{end}}" id="top-navbar">
   <div class="container">
-    {{ if not .IsHome }}
+    {{/*  {{ if not .IsHome }}
     <button class="navbar-toggler navbar-light" id="sidebar-toggler" type="button">
       <i data-feather="sidebar"></i>
     </button>
-    {{ end }}
+    {{ end }}  */}}
     <a class="navbar-brand" href="{{ site.BaseURL | relLangURL }}">
       {{ if $logo }}
         <img src="{{ $logo }}" id="logo" alt="Logo">
@@ -97,59 +97,47 @@
 
     <div class="collapse navbar-collapse dynamic-navbar" id="top-nav-items">
       <ul class="nav navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="{{ if .IsHome }}#home{{else}}{{ site.BaseURL | relLangURL }}#home{{end}}">{{ i18n "home" }}</a>
-        </li>
-        {{ if $sections }}
-          {{ $sectionCount := 1 }}
-          {{ range sort $sections "section.weight" }}
-            {{ if and (.section.enable) (.section.showOnNavbar)}}
-              {{ $sectionCount  = add $sectionCount 1}}
-              {{ if le $sectionCount $maxVisibleSections }}
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ partial "helpers/get-section-url.html" . }}">{{ .section.name }}</a>
-                </li>
-              {{ end }}
-            {{ end }}
-          {{- end }}
-          {{ if gt $sectionCount $maxVisibleSections }}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{i18n "more" }}</a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                {{ $sectionCount := 1 }}
-                {{ range sort $sections "section.weight" }}
-                  {{ if and (.section.enable) (.section.showOnNavbar) }}
-                    {{ $sectionCount  = add $sectionCount 1}}
-                    {{ if gt $sectionCount $maxVisibleSections }}
-                      <a class="dropdown-item" href="{{ partial "helpers/get-section-url.html" . }}">{{ .section.name }}</a>
-                    {{ end }}
-                  {{ end }}
-                {{- end }}
-              </div>
-            </li>
-          {{ end }}
-        {{- end }}
         {{ $shouldAddSeparator:= partial "helpers/add-navbar-separator.html" . }}
         {{ if $shouldAddSeparator }}
           <div id="top-navbar-divider"></div>
         {{ end }}
-        {{ if $blogEnabled }}
-          <li class="nav-item">
-            <a class="nav-link" id="blog-link" href="{{ path.Join (site.BaseURL | relLangURL) "posts" }}">{{ $blogTitle }}</a>
-          </li>
-        {{ end }}
-        {{ if $notesEnabled }}
-          <li class="nav-item">
-            <a class="nav-link" id="note-link" href="{{ path.Join (site.BaseURL | relLangURL) "notes" }}">{{ $notesTitle }}</a>
-          </li>
-        {{ end }}
-        {{ range $customMenus }}
-            {{ if (not .hideFromNavbar) }}
-              <li class="nav-item">
-                <a class="nav-link" href="{{ .url }}">{{ .name }}</a>
-              </li>
-            {{ end }}
-        {{ end }}
+
+        {{- $page := . }}
+        {{- with index site.Menus "main" }}
+          {{- partial "inline/menu/walk.html" (dict "page" $page "menuEntries" .) }}
+        {{- end }}
+        {{- define "partials/inline/menu/walk.html" }}
+          {{- $page := .Page }}
+          {{- range .menuEntries }}
+            {{- $attrs := dict "href" .URL }}
+            {{- $attrs = merge $attrs (dict "class" "nav-link") }}
+            {{- if $page.IsMenuCurrent .Menu . }}
+              {{- $attrs = merge $attrs (dict "class" "active" "aria-current" "page") }}
+            {{- else if $page.HasMenuCurrent .Menu .}}
+              {{- $attrs = merge $attrs (dict "class" "ancestor" "aria-current" "true") }}
+            {{- end }}
+            {{- $name := .Name }}
+            {{- with .Identifier }}
+              {{- with T . }}
+                {{- $name = . }}
+              {{- end }}
+            {{- end }}
+            <li class="nav-item">
+              <a
+                {{- range $k, $v := $attrs }}
+                  {{- with $v }}
+                    {{- printf " %s=%q" $k $v | safeHTMLAttr }}
+                  {{- end }}
+                {{- end -}}
+              >{{ $name }}</a>
+              {{- with .Children }}
+                <ul>
+                  {{- partial "inline/menu/walk.html" (dict "page" $page "menuEntries" .) }}
+                </ul>
+              {{- end }}
+            </li>
+          {{- end }}
+        {{- end }}
         {{ if .IsTranslated }}
           {{ partial "navigators/lang-selector.html" . }}
         {{ end }}
