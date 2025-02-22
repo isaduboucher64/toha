@@ -15,7 +15,8 @@
   {{ $sections = (index site.Data site.Language.Lang).sections }}
 {{ end }}
 
-{{ $backgroundImage:= "/images/default-background.jpg" }}
+{{ $backgroundImage:= "/images/banner.jpg" }}
+{{ $bodyBackgroundImage:= "/images/default-background.jpg" }}
 {{ if site.Params.background }}
   {{ $backgroundImage = site.Params.background }}
 {{ end }}
@@ -38,6 +39,8 @@
 {{/* get file that matches the filename as specified as src="" in shortcode */}}
 {{ $src := resources.Get $backgroundImage }}
 
+{{ $srcBody := resources.Get $bodyBackgroundImage }}
+
 {{/* set image sizes, these are hardcoded for now, x dictates that images are resized to this width */}}
 
 {{ $tinyw := default "500x" }}
@@ -52,6 +55,11 @@
 {{ $medium := $src.Resize $mediumw }}
 {{ $large := $src.Resize $largew }}
 
+{{ $tinyBody := $srcBody.Resize $tinyw }}
+{{ $smallBody := $srcBody.Resize $smallw }}
+{{ $mediumBody := $srcBody.Resize $mediumw }}
+{{ $largeBody := $srcBody.Resize $largew }}
+
 {{/* only use images smaller than or equal to the src (original) image size, as Hugo will upscale small images */}}
 {{/* set the sizes attribute to (min-width: 35em) 1200px, 100vw unless overridden in shortcode */}}
 
@@ -60,21 +68,25 @@
   {{ $small := $src}}
   {{ $medium := $src}}
   {{ $large := $src}}
-{{ end }}
 
-{{ if lt $src.Width "800" }}
-  {{ $small := $src}}
-  {{ $medium := $src}}
-  {{ $large := $src}}
+  {{ $tinyBody := $srcBody}}
+  {{ $smallBody := $srcBody}}
+  {{ $mediumBody := $srcBody}}
+  {{ $largeBody := $srcBody}}
 {{ end }}
 
 {{ if lt $src.Width "1200" }}
   {{ $medium := $src}}
   {{ $large := $src}}
+
+  {{ $mediumBody := $srcBody}}
+  {{ $largeBody := $srcBody}}
 {{ end }}
 
 {{ if lt $src.Width "1500" }}
   {{ $large := $src}}
+
+  {{ $largeBody := $srcBody}}
 {{ end }}
 
 {{/* get file that matches the filename as specified as src="" in shortcode */}}
@@ -117,6 +129,14 @@
     /* 0 to 299 */
     .content.background {
       background-image: url('{{ $tiny.RelPermalink }}');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-clip: content-box;
+    }
+    body {
+      background-image: url('{{ $tinyBody.RelPermalink }}');
+      background-size: cover;
+      background-repeat: no-repeat;
     }
     /* 320 to X */
     @media (min-width: 320px) and (max-width: 425px) {
@@ -135,20 +155,36 @@
         .content.background {   
           background-image: url('{{ $small.RelPermalink }}');
         }
+
+        body {
+          background-image: url('{{ $smallBody.RelPermalink }}');
+        }
     }
     @media (min-width: 801px) and (max-width: 1200px) { /* or 301 if you want really the same as previously.  */
         .content.background {   
           background-image: url('{{ $medium.RelPermalink }}');
+        }
+
+        body {
+          background-image: url('{{ $mediumBody.RelPermalink }}');
         }
     }
     @media (min-width: 1201px) and (max-width: 1500px) { /* or 301 if you want really the same as previously.  */
         .content.background {   
           background-image: url('{{ $large.RelPermalink }}');
         }
+
+        body {
+          background-image: url('{{ $largeBody.RelPermalink }}');
+        }
     }
     @media (min-width: 1501px) { /* or 301 if you want really the same as previously.  */
         .content.background {   
           background-image: url('{{ $src.RelPermalink }}');
+        }
+
+        body {
+          background-image: url('{{ $srcBody.RelPermalink }}');
         }
     }
 
@@ -193,7 +229,7 @@
     }
   </style>
     <span class="on-the-fly-behavior"></span>
-    <div class="content-container text-center mt-2">
+    <div class="content-container text-center">
         {{ .Content }}
     </div>
 </div>
