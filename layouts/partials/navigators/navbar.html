@@ -86,7 +86,7 @@
       {{ if $logo }}
         <img src="{{ $logo }}" id="logo" alt="Logo">
       {{ end }}
-      {{- $navBarTitle -}}
+      <span class="font-[Anton]">{{- $navBarTitle -}}</span>
     </a>
     <button
       class="navbar-toggler {{if .IsHome}}navbar-dark{{else}}navbar-light{{end}}"
