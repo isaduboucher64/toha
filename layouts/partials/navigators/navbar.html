@@ -70,7 +70,11 @@
 {{ if not $navBarTitle }}
   {{ $navBarTitle = site.Title }}
 {{ end }}
-
+<style>
+  .navbar-th.collapse {
+    visibility: inherit;
+  }
+</style>
 <nav class="navbar navbar-expand-xl top-navbar shadow {{ if .IsHome}}transparent-navbar homepage{{end}}" id="top-navbar">
   <div class="container">
     {{/*  {{ if not .IsHome }}
@@ -94,8 +98,7 @@
     >
       <i data-feather="menu"></i>
     </button>
-
-    <div class="collapse navbar-collapse dynamic-navbar" id="top-nav-items">
+    <div class="navbar-th collapse navbar-collapse dynamic-navbar" id="top-nav-items">
       <ul class="nav navbar-nav ms-auto">
         {{ $shouldAddSeparator:= partial "helpers/add-navbar-separator.html" . }}
         {{ if $shouldAddSeparator }}
